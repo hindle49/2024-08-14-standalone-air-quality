@@ -18,29 +18,27 @@ void setup() {
   debug(VER);  // The software version
   debug("\n\n");
 
-  OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
-
+  pinMode(BUTTON_1, INPUT_PULLUP); // configure he four button pins as inputs
+  //pinMode(BUTTON_2, INPUT_PULLUP);
+  //pinMode(BUTTON_3, INPUT_PULLUP);
+  //pinMode(BUTTON_4, INPUT_PULLUP);
+  
   pinMode(RED_LED, OUTPUT);   // set LED pin to and output
   pinMode(GREEN_LED, OUTPUT); // set LED pin to and output
 
-  digitalWrite(RED_LED, HIGH);  // flash the red led for 500ms
+  digitalWrite(GREEN_LED, HIGH);  // flash the red led for 500ms
   delay(500);
-  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
 
   digitalWrite(GREEN_LED, HIGH); // flash the green led for 500ms
   delay(500);
   digitalWrite(GREEN_LED, LOW);
 
-  //digitalWrite(RED_LED, HIGH);
+  OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
 
-  pinMode(BUTTON_1, INPUT_PULLUP); // configure he four button pins as inputs
-  pinMode(BUTTON_2, INPUT_PULLUP);
-  pinMode(BUTTON_3, INPUT_PULLUP);
-  pinMode(BUTTON_4, INPUT_PULLUP);
+  //startDS3231RTC();  // Start the External RTC module
 
-  startDS3231RTC();  // Start the External RTC module
-
-  LightSensor.begin();
+  //LightSensor.begin();
 
   OTA_Request = false;                           // these might not be needed
   run_normal  = false;                           // these might not ve needed
@@ -51,16 +49,6 @@ void setup() {
   system_mode = STOP;    // auto will be the default
 
   //wakeup_reason();  // Find out why this restarted. Not needed at present.
-
-  // Check for OTA or RTC buttons
-    bool butt_0 = digitalRead(BUTTON_1);  //Advance read of these two buttons
-    bool butt_1 = digitalRead(BUTTON_2);
-    
-
-  if (butt_0 == false)  run_OTA_start();
-  //if (butt_1 == false)  run_RTC_set_start();
-
-  if (butt_0 && butt_1) run_normal_start();  // Do this if no buttons pressed
 
   // after these start-up modes, now start the last common vTasks
 

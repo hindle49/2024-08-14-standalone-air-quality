@@ -8,9 +8,7 @@ void v_read_buttons(void *parameters) {
 
     // read the state of the switches into local variables:
     reading[0] = digitalRead(BUTTON_1);
-    reading[1] = digitalRead(BUTTON_2);
-    reading[2] = digitalRead(BUTTON_3);
-    reading[3] = digitalRead(BUTTON_4);
+
     
     for (uint8_t i = 0; i <= 3; i++) {
       // reset the flag which indicates there has been a recent change

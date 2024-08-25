@@ -6,9 +6,16 @@
 //        This version is to just getting started. This has been developed on my new Del laptop.
 //        At this stage the OLED started during Setup and then goes on to the paramters from the 'sw control sketch'
 //        This is going to take some effort to make the vTasks run witth a deep sleep
+//
+// V0002  Some simple first steps.
+//        Reduce output pins to 1.
+//        Reduce input pins to 1.
+//        Flash external LED twice at power on
+//        Show the power up messages on the OLED (Not in the correct part of the code)
+//        Main loop checks for functions complete and time out.
 
 
-const int VER = 1;
+const int VER = 2;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -75,14 +82,14 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 #define OLED_DISPLAY_WIDTH 128
 #define OLED_DISPLAY_HEIGHT 64
 
-#define RED_LED    GPIO_NUM_2  //LED_BUILTIN
-#define GREEN_LED  GPIO_NUM_15
-#define EX_RTC_INT GPIO_NUM_33  // RTC_GPIO_08              ADC 1_5
+#define GREEN_LED    GPIO_NUM_2   //LED_BUILTIN
+#define RED_LED      GPIO_NUM_15
+//#define EX_RTC_INT GPIO_NUM_33  // RTC_GPIO_08              ADC 1_5
 
 #define BUTTON_1 GPIO_NUM_12
-#define BUTTON_2 GPIO_NUM_13
-#define BUTTON_3 GPIO_NUM_14
-#define BUTTON_4 GPIO_NUM_27
+//#define BUTTON_2 GPIO_NUM_13
+//#define BUTTON_3 GPIO_NUM_14
+//#define BUTTON_4 GPIO_NUM_27
 
 #define OFF   0
 #define ON    1
@@ -97,6 +104,9 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 #define EARLY_EVENING 54  // This is 2pm until 3pm
 #define EVENING       55  // This is 3pm unilt 11pm
 #define ERROR         99  // Error state
+
+#define MAX_WAKE_TIME 15000 // 15 seconds on milli seconds. 
+#define SLEEP_TIME    60    //time to deep sleep in seconds
 
 
 // display / I2C bus
@@ -249,5 +259,9 @@ const uint8_t patterns[][5] = {
 
 };
 
+// New variables
+bool air_quality_acquired = false; // Clear to show air quality not yet acquired
+bool temp_hum_acquired    = false; // Clear to show temperature and humidty not yet acquired
+bool display_updated      = false; // Clear to show the OLED has not been updated 
 
 
