@@ -13,9 +13,12 @@
 //        Flash external LED twice at power on
 //        Show the power up messages on the OLED (Not in the correct part of the code)
 //        Main loop checks for functions complete and time out.
+// V0003  Move start up messages to the wake_reason.
+//
+// V0004  (Will need to move the test to deep sleep out of the main loop)
 
 
-const int VER = 2;
+const int VER = 3;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -105,7 +108,7 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 #define EVENING       55  // This is 3pm unilt 11pm
 #define ERROR         99  // Error state
 
-#define MAX_WAKE_TIME 15000 // 15 seconds on milli seconds. 
+#define MAX_WAKE_TIME 60000 // 15 seconds on milli seconds. 
 #define SLEEP_TIME    60    //time to deep sleep in seconds
 
 
@@ -117,7 +120,10 @@ const int I2C_DISPLAY_ADDRESS = 0x3c;
 const String WDAY_NAMES[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 const String MONTH_NAMES[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
-BH1750FVI LightSensor(BH1750FVI::k_DevModeContLowRes);   // for the i2c light sensor
+//BH1750FVI LightSensor(BH1750FVI::k_DevModeContLowRes);   // for the i2c light sensor
+//SSD1306Wire   display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
+SH1106Wire      display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
+
 
 const char* NTP_SERVER = "pool.ntp.org";
 const char* TZ_INFO    = "GMT+0BST-1,M3.5.0/01:00:00,M10.5.0/02:00:00";  // enter your time zone (https://remotemonitoringsystems.ca/time-zone-abbreviations.php)
@@ -186,8 +192,7 @@ uint8_t checksum_calc;  // Use this to calulate the checksum value. Forces it to
 led_data sent;  // This is for the data sent to the remote Lanterns
 led_data local; // This is for the local data, which is being prepaired for transmission
 
-//SSD1306Wire   display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
-SH1106Wire      display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
+
 
 bool buttonState[4] = {true, true, true, true}; // used to record the actual state of the button
 

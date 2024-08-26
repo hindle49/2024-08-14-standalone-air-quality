@@ -37,6 +37,8 @@ void wakeup_reason()
     default : 
       debug("Wakeup was not caused by deep sleep: "); 
       debugln(wakeup_reason );
+
+      OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
       break;
   }
 

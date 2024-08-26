@@ -53,19 +53,7 @@ void vget_new_unix_time (void *parameters)
   
   while(1)
      {
-     if ( (have_acquired_new_unix_time == false) && (WiFi_Connected == true)  )   //only true is there's no time and the wifi is connected
-         {
-            if (getNTPtime(10)) 
-            {  // wait up to 10sec to sync
-            have_acquired_new_unix_time = true;   // Show the time has been changed.
-            } 
-            else 
-            {
-            #ifdef DEBUG
-             Serial.println("Time not set");
-            #endif
-            }
-         }
+
            
    vTaskDelay(1000 / portTICK_PERIOD_MS);  // wait 1s and try again
      }

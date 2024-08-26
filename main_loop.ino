@@ -4,7 +4,8 @@ void vmain_loop (void *parameters)
  unsigned long wake_up_time = millis();  // define the elapsedTime and set to the present time.
                                         // this will be used to measure how long the unot has been awake.
   
-  
+  for(;;)  //for the rtos task
+  {
   //Run a multi layer test to see if the main loop, should go around again, or deep sleep
 
   if ( 
@@ -25,5 +26,5 @@ else
      esp_deep_sleep_start();
     }
 
-
+  } // end of the for loop
 }
