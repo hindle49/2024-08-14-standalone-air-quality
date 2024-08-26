@@ -15,10 +15,13 @@
 //        Main loop checks for functions complete and time out.
 // V0003  Move start up messages to the wake_reason.
 //
-// V0004  (Will need to move the test to deep sleep out of the main loop)
+// V0004  Test for deep sleep now in its own rtos task
+//        main loop is doing nothing
+//        new function to start all the VTasks
+//        wake up messages starts, but then goes blank
 
 
-const int VER = 3;
+const int VER = 4;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
