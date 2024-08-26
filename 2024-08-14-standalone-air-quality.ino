@@ -29,12 +29,13 @@ void setup() {
   digitalWrite(GREEN_LED, HIGH);  // flash the red led for 500ms
   delay(500);
   digitalWrite(GREEN_LED, LOW);
-
+  delay(500);
   digitalWrite(GREEN_LED, HIGH); // flash the green led for 500ms
   delay(500);
   digitalWrite(GREEN_LED, LOW);
+  delay(500);
 
-  OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
+  //OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
 
   //startDS3231RTC();  // Start the External RTC module
 
@@ -48,19 +49,19 @@ void setup() {
 
   system_mode = STOP;    // auto will be the default
 
-  //wakeup_reason();  // Find out why this restarted. Not needed at present.
+  wakeup_reason();  // Find out why this restarted. Not needed at present.
 
   // after these start-up modes, now start the last common vTasks
 
   // Button scanning
-     // This is the task to scan buttons
-   xTaskCreatePinnedToCore(v_read_buttons,
+     // This is the task to scan buttons (turn off for now)
+   /* xTaskCreatePinnedToCore(v_read_buttons,
       "BUTTONS",
       2048,
       NULL,
       2,  //Priority
       NULL,
-      1); //Core 
+      1); //Core */
 
 
     // This is the task to keep refreshing the display
@@ -73,6 +74,7 @@ void setup() {
       1); //Core
     
   // This is the task to read the light level
+  /*
   xTaskCreatePinnedToCore(vreadLightLevel,
       "LIGHTLEVEL",
       2048,
@@ -80,6 +82,7 @@ void setup() {
       2,  //Priority
       NULL,
       1); //Core
+  */
 
 
 

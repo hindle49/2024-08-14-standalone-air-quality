@@ -55,10 +55,11 @@ void OLED_StartUpMessages() {
 void v_updateTheDisplay(void *parameters)  // The is the main display setting am to run once a second
 {
   char  a_string[5];
+  
   while (1) {
     static bool colon;  // This will be used to flash the time colon
 
-    getTimeFromRTC(); //Getet the time frm the RTC module
+    //getTimeFromRTC(); //Getet the time frm the RTC module
 
     display.clear();
 
@@ -85,17 +86,7 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
        }
 
 
-    // Display system_mode in the botton left
-    if (system_mode == OFF) 
-      display.drawString(0, 52, "Off");
-
-    if (system_mode == AUTO) 
-      display.drawString(0, 52, "Auto");
-
-    if (system_mode == ON) 
-      display.drawString(0, 52, "On");
-
-    // time bottom right  
+   // time bottom right  
     display.drawString(97, 52, String(tm_hour));
     if (colon) display.drawString(111, 52, ":");
     colon = !colon;
@@ -132,16 +123,17 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
         display.drawString(85, 40, a_string);
         
         sprintf( a_string , "%02X", local.pattern);
-        display.drawString(0, 0,   "Pattern");        display.drawString (63, 0, a_string);  
+        display.drawString(0, 0,   "Temperature");        display.drawString (63, 0, a_string);  
         sprintf( a_string , "%02X", local.step);
-        display.drawString(0, 10,  "Step Rate");      display.drawString (63, 10, a_string);  
+        display.drawString(0, 10,  "Humidity");      display.drawString (63, 10, a_string);  
         sprintf( a_string , "%02X", local.sync);
-        display.drawString(0, 20,  "Sync Level");     display.drawString (63, 20, a_string);  
+        display.drawString(0, 20,  "Ehanol");     display.drawString (63, 20, a_string);  
         sprintf( a_string , "%02X", local.brightness);
-        display.drawString(0, 30,  "Brightness");     display.drawString (63, 30, a_string);  
+        display.drawString(0, 30,  "Ozone");     display.drawString (63, 30, a_string);  
         sprintf( a_string , "%02d", display_time_varable);
-        display.drawString(0, 40,  "Next Pattern");   display.drawString (63, 40, a_string);  
+        display.drawString(0, 40,  "Toluene");   display.drawString (63, 40, a_string);  
         
+        display.drawString(0, 50,  "AQI");
         }
 
 
