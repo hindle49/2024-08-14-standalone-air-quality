@@ -1,4 +1,4 @@
-bool getNTPtime(int sec) 
+/* bool getNTPtime(int sec) 
  {
  {
     uint32_t start = millis();
@@ -58,3 +58,5 @@ void vget_new_unix_time (void *parameters)
    vTaskDelay(1000 / portTICK_PERIOD_MS);  // wait 1s and try again
      }
 }
+
+*/

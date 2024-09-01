@@ -22,14 +22,7 @@ void setup() {
   pinMode(RED_LED, OUTPUT);   // set LED pin to and output
   pinMode(GREEN_LED, OUTPUT); // set LED pin to and output
 
-  digitalWrite(GREEN_LED, HIGH);  // flash the red led for 500ms
-  delay(500);
-  digitalWrite(GREEN_LED, LOW);
-  delay(500);
-  digitalWrite(GREEN_LED, HIGH); // flash the green led for 500ms
-  delay(500);
-  digitalWrite(GREEN_LED, LOW);
-  delay(500);
+  
 
   wakeup_reason();  // Find out why this restarted. Not needed at present.
 
@@ -37,7 +30,7 @@ void setup() {
 
 void loop() 
 {
-  vTaskDelay(15000 / portTICK_PERIOD_MS);  // release the task for 15 second
+  vTaskDelay(60000 / portTICK_PERIOD_MS);  // release the task for 15 second
   // Have read that the main loop is set to a prority of 1, so run other stuff at lest P2.
 }
 

@@ -19,9 +19,11 @@
 //        main loop is doing nothing
 //        new function to start all the VTasks
 //        wake up messages starts, but then goes blank
+//
+// V0005  
 
 
-const int VER = 4;
+const int VER = 5;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -51,6 +53,8 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <ArduinoOTA.h>
 #include <DS3231.h>
 #include <BH1750FVI.h>     // for the light sensor
+#include <Adafruit_AHTX0.h>    // Temperature and Humidity
+#include <ScioSense_ENS160.h>  // Air Quality - ENS160 library "Use the Adafruit fork version of the library"
 
 #include <ESPmDNS.h>       // for OTA
 #include <WiFiUdp.h>       // for OTA
@@ -127,6 +131,10 @@ const String MONTH_NAMES[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", 
 //SSD1306Wire   display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
 SH1106Wire      display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
 
+Adafruit_AHTX0 aht;
+ScioSense_ENS160      ens160(ENS160_I2CADDR_0);
+//ScioSense_ENS160      ens160(ENS160_I2CADDR_1);
+
 
 const char* NTP_SERVER = "pool.ntp.org";
 const char* TZ_INFO    = "GMT+0BST-1,M3.5.0/01:00:00,M10.5.0/02:00:00";  // enter your time zone (https://remotemonitoringsystems.ca/time-zone-abbreviations.php)
@@ -201,75 +209,24 @@ bool buttonState[4] = {true, true, true, true}; // used to record the actual sta
 
 bool button1JustChanged[4] = {false, false, false, false}; // used to show the button has just change state.
 
-uint8_t lantern_1_Address[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-
-// Peer info
-esp_now_peer_info_t peerInfo;
-
-uint8_t system_mode; // Use this to track the mode of operation. Off / Auto / On
-bool    system_mode_transition; // Use this to flag a recent change.
-
-uint8_t day_state;   // Use this is set what day mode the system is in
-bool    day_state_transistion; // Use this to indicate a recent transistion.
-uint8_t display_time_varable;  // use this to show the counter down time on the display
-
-
-
-const uint8_t number_of_patter_steps = 37; // 0 to x
-const uint8_t patterns[][5] = {
-//                              
-//  
-                          
-// Pattern, Step Rate,  Sync Level, Brightness,  Pattern Duration (in seconds decimal.)
-  {0xf7,    0xff,       0x00,       0x10,        60},              // 1) Fixed white,  30 sec
-  {0xf8,    0xff,       0x00,       0x10,        60},              // 2) Fixed red,    15 sec
-  {0xf9,    0xff,       0x00,       0x10,        60},              // 3) Fixed blue,   30 sec
-  {0xfa,    0xff,       0x00,       0x10,        60},              // 4) Fixed green,  45 sec
-  {0xfb,    0xff,       0x00,       0x10,        60},              // 5) Fixed purple, 15 sec
-  {0xfc,    0xff,       0x00,       0x10,        60},              // 6) Fixed yellow, 45 sec
-  {0xfd,    0xff,       0x00,       0x10,        60},              // 7) Fixed cyan,   15 sec
-
-  {0x0a,    0x40,       0x01,       0x00,        60},              // 8) white chase
-  {0x0b,    0x40,       0x01,       0x00,        60},              // 9  red chase
-  {0x0c,    0x40,       0x01,       0x00,        60},              // 10 blue chase
-  {0x0d,    0x40,       0x01,       0x00,        60},              // 11 green chase
-  {0x0e,    0x40,       0x01,       0x00,        60},              // 12 purpule chase
-  {0x0f,    0x40,       0x01,       0x00,        60},              // 13 yellow chase
-  {0x10,    0x40,       0x01,       0x00,        60},              // 14 cyan chase
-
-  {0x11,    0xff,       0x00,       0x00,        60},              // 15 white spin}
-  {0x12,    0xff,       0x00,       0x00,        60},              // 16 red spin
-  {0x13,    0xff,       0x00,       0x00,        60},              // 17 blue spin
-  {0x14,    0xff,       0x00,       0x00,        60},              // 18 green spin
-  {0x15,    0xff,       0x00,       0x00,        60},              // 19 purple spin
-  {0x16,    0xff,       0x00,       0x00,        60},              // 20 yellow spin
-  {0x17,    0xff,       0x00,       0x00,        60},              // 21 cyan spin
-
-  {0x60,    0x00,       0x05,       0x00,        60},              // 22 candle
-
-  {0x80,    0x80,       0x00,       0x10,        60},              // 23 Lightening
-  {0x81,    0x80,       0x00,       0x10,        60},              // 24 Lightening
-  {0x82,    0x80,       0x00,       0x10,        60},              // 25 Lightening
-  {0x83,    0x80,       0x00,       0x10,        60},              // 26 Lightening
-  {0x84,    0x80,       0x00,       0x10,        60},              // 27 Lightening
-  {0x85,    0x80,       0x00,       0x10,        60},              // 28 Lightening
-  {0x86,    0x80,       0x00,       0x10,        60},              // 29 Lightening
-
-  {0x88,    0x80,       0x00,       0x04,        60},              // 30 Lightening+
-  {0x89,    0x80,       0x00,       0x04,        60},              // 31 Lightening+
-  {0x8a,    0x80,       0x00,       0x04,        60},              // 32 Lightening+
-  {0x8b,    0x80,       0x00,       0x04,        60},              // 23 Lightening+
-  {0x8c,    0x80,       0x00,       0x04,        60},              // 34 Lightening+
-  {0x8d,    0x80,       0x00,       0x04,        60},              // 35 Lightening+
-  {0x8e,    0x80,       0x00,       0x04,        60},              // 36 Lightening+
-
-  {0xa0,    0x80,       0x00,       0x18,        60},              // 37 Random
-
-};
 
 // New variables
 bool air_quality_acquired = false; // Clear to show air quality not yet acquired
 bool temp_hum_acquired    = false; // Clear to show temperature and humidty not yet acquired
 bool display_updated      = false; // Clear to show the OLED has not been updated 
+
+RTC_DATA_ATTR bool WIFI_enabled = false; //Store this in RTC NVRAM. (Might have to remove the = false)
+
+float        temperature = 0.0;
+float        humidity    = 0.0;
+unsigned int Aqi         = 0;
+unsigned int Tvoc        = 0;
+float        Co2         = 0;
+float        Hp0         = 0;
+float        Hp1         = 0;
+float        Hp2         = 0;
+float        Hp3         = 0;
+
+
 
 

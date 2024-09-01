@@ -1,3 +1,4 @@
+/*
 void run_OTA_start() 
 {
   OTA_Request = true;   // set flag to show system is doing an OTA update
@@ -93,3 +94,5 @@ void vOTA(void *parameters)
   vTaskDelay(50 / portTICK_PERIOD_MS);  // 50mS
   }  // End of the while loop
 } // end of the task loop
+
+*/

@@ -2,7 +2,7 @@ void start_RTOS_tasks()
 
   {
     
-    // Start if deep sleep can start a deep sleep
+    // Start ready for deep sleep
     xTaskCreatePinnedToCore(vTestForDeepSleep,
       "SLEEP_TEST",
       2048,
@@ -12,14 +12,16 @@ void start_RTOS_tasks()
       1);
 
       // Start air quality, temperature, hunidity read task
-      xTaskCreatePinnedToCore(vreadAirQuality,
+      xTaskCreatePinnedToCore(vReadAirQuality,
       "AIR_QUALITY",
       2048,
       NULL,
-      2,  //Priority
+      3,  //Priority
       NULL,
       1);
 
+
+      /*
       // Start OLED task
       xTaskCreatePinnedToCore(v_updateTheDisplay,
       "OLED",
@@ -27,7 +29,8 @@ void start_RTOS_tasks()
       NULL,
       2,  //Priority
       NULL,
-      1);     
+      1); 
+      */    
     
     
     /*
