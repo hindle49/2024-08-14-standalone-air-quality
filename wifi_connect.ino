@@ -1,3 +1,4 @@
+/*
 void v_wifi_connection(void *parameters)
 {
   for(;;)
@@ -43,3 +44,5 @@ void v_wifi_connection(void *parameters)
     vTaskDelay(5000 / portTICK_PERIOD_MS);  // release the task for 5 second before testing if the connection is still working 
    }
 }
+
+*/

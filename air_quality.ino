@@ -1,24 +1,85 @@
-// The global paramter  'averageLux' will hold the measured light level
-
-
-void vreadAirQuality(void *parameters) 
+void vReadAirQuality(void *parameters) 
 {
- for(;;) // Just to keep the RTOS task running
- {
-   if( air_quality_acquired == false) //false indicates the two air quality parameters have not been acquired
-    {
+  bool air_quality_module_started = false;  // Use this to flag if the two parts of the air quality module have been started
 
-    // when both paramter sets have been acquired   air_quality_acquired == false
-    vTaskDelay(1000 / portTICK_PERIOD_MS);  // A short sleep until both sets of data acquired ms. (1 second)
-    }
-   else
-   {
-    // There's no need to do anything, so set a long vTaskDelay
-   vTaskDelay(60000 / portTICK_PERIOD_MS);  // A short sleep until both sets of data acquired ms. (60 seconds)
-   }
+  sensors_event_t te;
+  sensors_event_t hu;
 
 
- }
+ while (1) // Just to keep the RTOS task running
+  {
+   
+   if( air_quality_module_started == false ) //false indicates the two air quality parameters have not been started
+       {
+        aht.begin();
+        ens160.begin();
+        vTaskDelay(2000 / portTICK_PERIOD_MS);  // A short sleep until both units have started 2000ms. (2 second)
+        air_quality_module_started = true;      // Flag that the two modules have started, so there is no attempt to restart them again.
+        ens160.setMode(ENS160_OPMODE_STD);
+        debugln("Started both air quality modules");
+       }
+
+    debugln("Read modules ");
+    
+    
+    if ( (air_quality_acquired == false) && ens160.available() )  // tests to see if the data has already been acquired and if there is new data to get from the module
+      {
+        ens160.measure(true);
+        ens160.measureRaw(true);
+
+        Aqi = ens160.getAQI();
+        Tvoc = ens160.getTVOC();
+        Co2 = ens160.geteCO2();
+        Hp0 = ens160.getHP0();
+        Hp1 = ens160.getHP1();
+        Hp2 = ens160.getHP2();
+        Hp3 = ens160.getHP3();
+
+        debug("AQI : ");
+        debugln(Aqi);
+
+        debug("TVOC : ");
+        debugln(Tvoc);
+
+        debug("Co2 : ");
+        debugln(Co2);
+
+        debug("HP0 : ");
+        debugln(Hp0);
+
+        debug("HP1 : ");
+        debugln(Hp1);
+
+        debug("HP2 : ");
+        debugln(Hp2);
+
+        debug("HP3 : ");
+        debugln(Hp3);        
+
+        //change the flag to show data recieved
+        air_quality_acquired = true;  // flag that the air quality data has been acquired  
+      }
+      
 
 
-}
+    if ( temp_hum_acquired == false )  // need the other module data
+        {
+          //change the flag to show data recieved
+          aht.getEvent(&hu, &te);  
+
+          temp_hum_acquired = true; // flag that the temperature and humidity has been acquired
+
+          temperature = te.temperature;
+          humidity    = hu.relative_humidity;
+        
+          debug("Humidity : "); 
+          debug(humidity);
+          debug("  Temperature : ");
+          debugln(temperature);
+
+        }
+    // wait for 2 seconds before trying again
+    vTaskDelay(2000 / portTICK_PERIOD_MS);  // A short sleep until both sets of data acquired ms. (2 second)
+
+  } // End of the while loop
+}     // End of the function

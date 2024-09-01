@@ -38,6 +38,15 @@ void wakeup_reason()
     default : 
       debug("Wakeup was not caused by deep sleep: "); 
       debugln(wakeup_reason );
+      
+      digitalWrite(GREEN_LED, HIGH);  // flash the red led for 500ms
+      delay(500);
+      digitalWrite(GREEN_LED, LOW);
+      delay(500);
+      digitalWrite(GREEN_LED, HIGH); // flash the green led for 500ms
+      delay(500);
+      digitalWrite(GREEN_LED, LOW);
+      delay(500);
 
       OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
       start_RTOS_tasks();
@@ -51,7 +60,7 @@ void vTestForDeepSleep(void *parameters)
   unsigned long wake_up_time = millis();  // define the elapsedTime and set to the present time.
                                         // this will be used to measure how long the unot has been awake. 
   
-  for(;;)  //for the rtos task
+  while(1)  //for the rtos task
   {
   //Run a multi layer test to see if the main loop, should go around again, or deep sleep
 

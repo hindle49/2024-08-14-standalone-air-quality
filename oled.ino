@@ -1,4 +1,6 @@
-void OLED_StartUpMessages() {
+void OLED_StartUpMessages() 
+
+{
   display.init();
   display.clear();
   display.display();
@@ -47,8 +49,10 @@ void OLED_StartUpMessages() {
   display.display();
 
   delay(2000);  // allow time for user to read the display
-  display.clear();
-  display.display();
+  //display.clear();
+  //display.display();
+
+
 }
 
 
@@ -82,7 +86,7 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             display.drawString(0, 20,  "Ehanol");     display.drawString (63, 20, a_string);  
             sprintf( a_string , "%02X", local.brightness);
             display.drawString(0, 30,  "Ozone");     display.drawString (63, 30, a_string);  
-            sprintf( a_string , "%02d", display_time_varable);
+            sprintf( a_string , "%02d", Hp1);
             display.drawString(0, 40,  "Toluene");   display.drawString (63, 40, a_string);  
         
             display.drawString(0, 50,  "AQI");
@@ -98,6 +102,6 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             } 
     
        
-        } // data not ready
+        } // end of the dat test loop and display
   }    // end while loop
 }      // main function loop

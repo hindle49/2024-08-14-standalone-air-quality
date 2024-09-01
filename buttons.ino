@@ -1,4 +1,4 @@
-
+/*
 void v_read_buttons(void *parameters) {
   while (1) {
     static unsigned long lastDebounceTime[4] = { 0, 0, 0, 0 };
@@ -50,3 +50,5 @@ void v_read_buttons(void *parameters) {
     vTaskDelay(50 / portTICK_PERIOD_MS);  // Set this to fixed delay for 50ms. The top will check the progress and if an update is needed.
   }
 }
+
+*/
