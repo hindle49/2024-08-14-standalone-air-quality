@@ -74,14 +74,19 @@ void vTestForDeepSleep(void *parameters)
         ( 
           millis() <= wake_up_time + MAX_WAKE_TIME 
         )
-    )  
-      vTaskDelay(5000 / portTICK_PERIOD_MS) ; // 5 seconds
+    ) 
+    {
+    vTaskDelay(5000 / portTICK_PERIOD_MS) ; // 5 seconds
+    } 
+   
 else
     {                                        // If the above parameters failed, do a timed deep sleep.
      debugln("Entering deep sleep");
      esp_sleep_enable_timer_wakeup(SLEEP_TIME * 1000000);
      esp_deep_sleep_start();
     }
+
+ 
 
   } // end of the for loop
  

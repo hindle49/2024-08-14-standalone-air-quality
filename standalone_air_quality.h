@@ -20,10 +20,11 @@
 //        new function to start all the VTasks
 //        wake up messages starts, but then goes blank
 //
-// V0005  
+// V0005  Sensor data being displayed via dub to the the serial port
+// V0006  Add basic data to the screen
 
 
-const int VER = 5;
+const int VER = 6;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -217,15 +218,15 @@ bool display_updated      = false; // Clear to show the OLED has not been update
 
 RTC_DATA_ATTR bool WIFI_enabled = false; //Store this in RTC NVRAM. (Might have to remove the = false)
 
-float        temperature = 0.0;
-float        humidity    = 0.0;
-unsigned int Aqi         = 0;
-unsigned int Tvoc        = 0;
-float        Co2         = 0;
-float        Hp0         = 0;
-float        Hp1         = 0;
-float        Hp2         = 0;
-float        Hp3         = 0;
+float         temperature = 0.0;
+float         humidity    = 0.0;
+unsigned int  Aqi         = 0;
+unsigned int  Tvoc        = 0;
+unsigned long Co2         = 0;
+unsigned long Hp0         = 0;
+unsigned long Hp1         = 0;
+unsigned long Hp2         = 0;
+unsigned long Hp3         = 0;
 
 
 
