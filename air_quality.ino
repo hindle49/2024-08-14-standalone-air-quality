@@ -57,7 +57,7 @@ void vReadAirQuality(void *parameters)
         debugln(Hp3);        
 
         //change the flag to show data recieved
-        air_quality_acquired = true;  // flag that the air quality data has been acquired  
+        air_quality_acquired = true;  // flag that the air quality data has been acquired (good that this is after the variables have been set)
       }
       
 
@@ -77,7 +77,12 @@ void vReadAirQuality(void *parameters)
           debug("  Temperature : ");
           debugln(temperature);
 
+          temp_hum_acquired = true; // flag that the temperature and humidity has been acquired (moved to after the variables have been set)
+
         }
+    
+    if ( ( air_quality_acquired == true) && (temp_hum_acquired == true)) vTaskDelete(NULL);
+    
     // wait for 2 seconds before trying again
     vTaskDelay(2000 / portTICK_PERIOD_MS);  // A short sleep until both sets of data acquired ms. (2 second)
 

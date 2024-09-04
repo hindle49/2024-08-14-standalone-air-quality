@@ -58,7 +58,7 @@ void OLED_StartUpMessages()
 
 void v_updateTheDisplay(void *parameters)  // The is the main display setting am to run once a second
 {
-  char  a_string[5];
+  char  a_string[10];
   
   while (1) 
   {
@@ -66,42 +66,61 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
        {
        if ( ( air_quality_acquired == true ) && (temp_hum_acquired == true) ) // both data sets read to display
             {
+            display.init();
+            display.flipScreenVertically();
             display.clear();
 
             // Set font for the larger characters
             display.setFont(ArialMT_Plain_10);  // was 10 or 16
             display.setTextAlignment(TEXT_ALIGN_LEFT);
 
-            sprintf( a_string , "%4.1f C", tm_temperature);
-            display.drawString(90, 30, a_string);
-          
-            sprintf( a_string , "%3d Lux", averageLux);
-            display.drawString(85, 40, a_string);
+            
+            sprintf( a_string , "%4.1f", temperature); 
+            display.drawString(0, 0,   "Temp");          display.drawString (35, 0, a_string);    //display.drawString(90, 0, "C");
+            
+            sprintf( a_string , "%4.1f", humidity);
+            display.drawString(0, 10,  "Humid");         display.drawString (35, 10, a_string);   //display.drawString(90, 10, "%RH");
+
+            sprintf( a_string , "%2.0d", Aqi);
+            display.drawString(0, 20,  "AQI");           display.drawString (30, 20, a_string);   //display.drawString(90, 20, "ppb");
+
+            sprintf( a_string , "%5.0d", Tvoc);
+            display.drawString(0, 30,  "TVOC");          display.drawString (23, 30, a_string); 
+
+            sprintf( a_string , "%5.0lu", Co2);
+            display.drawString(0, 40,  "eCO2");          display.drawString (30, 40, a_string);  
         
-            sprintf( a_string , "%02X", local.pattern);
-            display.drawString(0, 0,   "Temperature");        display.drawString (63, 0, a_string);  
-            sprintf( a_string , "%02X", local.step);
-            display.drawString(0, 10,  "Humidity");      display.drawString (63, 10, a_string);  
-            sprintf( a_string , "%02X", local.sync);
-            display.drawString(0, 20,  "Ehanol");     display.drawString (63, 20, a_string);  
-            sprintf( a_string , "%02X", local.brightness);
-            display.drawString(0, 30,  "Ozone");     display.drawString (63, 30, a_string);  
-            sprintf( a_string , "%02d", Hp1);
-            display.drawString(0, 40,  "Toluene");   display.drawString (63, 40, a_string);  
-        
-            display.drawString(0, 50,  "AQI");
+            
+            sprintf( a_string , "%5.0lu", Hp0);
+            display.drawString(62, 0,  "HP0");           display.drawString (90, 0, a_string);
+
+            sprintf( a_string , "%5.0lu", Hp1);
+            display.drawString(62, 10,  "HP1");           display.drawString (90, 10, a_string);
+
+            sprintf( a_string , "%5.0lu", Hp2);
+            display.drawString(62, 20,  "HP2");           display.drawString (90, 20, a_string);
+
+            sprintf( a_string , "%5.0lu", Hp3);
+            display.drawString(62, 30,  "HP3");           display.drawString (90, 30, a_string);
+
+
+
             display.display();
+
+
+
 
             display_updated = true;
 
-            vTaskDelay(60000 / portTICK_PERIOD_MS);  // A long sleep ms. (60 seconds)
+            //vTaskDelay(1000 / portTICK_PERIOD_MS);  // A long sleep ms. (6 seconds)
             }
-       else
+       /*else
             {   // data for display not ready
             vTaskDelay(1000 / portTICK_PERIOD_MS);  // Set this to fixed delay for 1000ms, and try again
-            } 
+            } */
     
        
         } // end of the dat test loop and display
+  vTaskDelay(1000 / portTICK_PERIOD_MS);  // A long sleep ms. (6 seconds)
   }    // end while loop
 }      // main function loop
