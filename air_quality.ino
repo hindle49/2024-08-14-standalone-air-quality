@@ -13,7 +13,10 @@ void vReadAirQuality(void *parameters)
        {
         aht.begin();
         ens160.begin();
-        vTaskDelay(2000 / portTICK_PERIOD_MS);  // A short sleep until both units have started 2000ms. (2 second)
+        
+        ens160.setMode(ENS160_OPMODE_LP);
+
+        vTaskDelay(5000 / portTICK_PERIOD_MS);  // A short sleep until both units have started 5000ms. (5 second)
         air_quality_module_started = true;      // Flag that the two modules have started, so there is no attempt to restart them again.
         ens160.setMode(ENS160_OPMODE_STD);
         debugln("Started both air quality modules");
@@ -34,6 +37,8 @@ void vReadAirQuality(void *parameters)
         Hp1 = ens160.getHP1();
         Hp2 = ens160.getHP2();
         Hp3 = ens160.getHP3();
+
+        ens160.setMode(ENS160_OPMODE_DEP_SLEEP);
 
         debug("AQI : ");
         debugln(Aqi);

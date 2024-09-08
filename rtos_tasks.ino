@@ -40,5 +40,13 @@ void start_RTOS_tasks()
       1);
     */
 
+    xTaskCreatePinnedToCore(v_ReadBatteryVoltage,
+      "BATTERY",
+      2048,
+      NULL,
+      2,  //Priority
+      NULL,
+      1);
+
 
   }
