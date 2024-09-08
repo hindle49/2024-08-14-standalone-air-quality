@@ -22,7 +22,7 @@ void setup() {
   pinMode(RED_LED, OUTPUT);   // set LED pin to and output
   pinMode(GREEN_LED, OUTPUT); // set LED pin to and output
 
-  
+  Wire.setClock(100000); // Force the I2C bus frequency
 
   wakeup_reason();  // Find out why this restarted. Not needed at present.
 

@@ -100,9 +100,12 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             sprintf( a_string , "%5.0lu", Hp2);
             display.drawString(62, 20,  "HP2");           display.drawString (90, 20, a_string);
 
+            /*
             sprintf( a_string , "%5.0lu", Hp3);
             display.drawString(62, 30,  "HP3");           display.drawString (90, 30, a_string);
-
+            */
+            sprintf( a_string , "%3.1f", battery_voltage);
+            display.drawString(62, 30,  "Vbatt");         display.drawString (90, 30, a_string);
 
 
             display.display();

@@ -22,9 +22,12 @@
 //
 // V0005  Sensor data being displayed via dub to the the serial port
 // V0006  Add basic data to the screen
+// V0007  Add a task to read the battery level.
+//        The battery voltage is presented on anaologue pin A0, via two 1M resistors. Aka, A0 will be 0.5 * battery voltage
+//        The unit is now showing a voltage as a figure on the display Vbatt 4.2. 
 
 
-const int VER = 6;
+const int VER = 7;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -101,6 +104,10 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 //#define BUTTON_2 GPIO_NUM_13
 //#define BUTTON_3 GPIO_NUM_14
 //#define BUTTON_4 GPIO_NUM_27
+
+#define VBATT_PIN A0 // Pin 4?, or 5. More lickly 5   was A0
+
+#define BATTERY_END_VOLTAGE 3.0
 
 #define OFF   0
 #define ON    1
@@ -227,6 +234,8 @@ unsigned long Hp0         = 0;
 unsigned long Hp1         = 0;
 unsigned long Hp2         = 0;
 unsigned long Hp3         = 0;
+
+float         battery_voltage = 0.0;
 
 
 
