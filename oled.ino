@@ -4,19 +4,19 @@
 #define bar_right_x3  128
 
 #define vbatt_top_y    59
-#define tvoc_top_y     42
-#define co2_top_y      42
+#define tvoc_top_y     32
+#define co2_top_y      32
 
 #define bar_height 5
 
 #define vbatt_min 2000
-#define vbatt_max 4500
+#define vbatt_max 4200
 
 #define tvoc_min 0
-#define tvoc_max 300      //65000
+#define tvoc_max 100      //65000
 
 #define co2_min 300
-#define co2_max 2000       //65000
+#define co2_max 1000       //65000
 
 
 void OLED_StartUpMessages() 
@@ -80,9 +80,9 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
   char  a_string[10];
   int bar_length = 0; //use as a temp variable for calculating the bar length
 
-  //battery_voltage = constrain (battery_voltage, vbatt_min, vbatt_max); // limit the bar graph range
-  //Tvoc            = constrain (Tvoc           ,  tvoc_min, tvoc_max ); // limit the bar graph range 
-  //Co2             = constrain (Co2            ,  co2_min,   co2_max ); // limit the bar graph rang
+  unsigned long bar_battery_voltage = 0;
+  unsigned int  bar_Tvoc            = 0;
+  unsigned long bar_Co2             = 0;
   
   while (1) 
   {
@@ -94,47 +94,55 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             display.flipScreenVertically();
             display.clear();
 
+            bar_battery_voltage = constrain (battery_voltage, vbatt_min, vbatt_max); // limit the bar graph range
+            bar_Tvoc            = constrain (Tvoc           ,  tvoc_min, tvoc_max ); // limit the bar graph range
+            bar_Co2             = constrain (Co2            ,  co2_min,   co2_max ); // limit the bar graph rang
+
             // Set font for the smaller characters
             display.setFont(ArialMT_Plain_10);  // was 10 or 16
             display.setTextAlignment(TEXT_ALIGN_LEFT);
 
+            //Wifi
+            display.drawString(0, 0, "WiFi");
+            if (WIFI_enabled == false)  display.drawString(30, 0, "Off");
+
+            //Time
+
             
-            sprintf( a_string , "%4.1f", temperature); 
-            display.drawString(0, 0,   "Temp");          display.drawString (35, 0, a_string);    //display.drawString(90, 0, "C");
+            sprintf( a_string , "%5.1f", temperature); 
+            display.drawString(0, 10,   "Temp");          display.drawString (28, 10, a_string);    display.drawString(52, 10, "C");
             
+            // Humidity
             sprintf( a_string , "%4.1f", humidity);
-            display.drawString(0, 10,  "Humid");         display.drawString (35, 10, a_string);   //display.drawString(90, 10, "%");
+            display.drawString(64, 10,  "Humid");         display.drawString (99, 10, a_string);   display.drawString(120, 10, "%");
 
-            
-            //sprintf( a_string , "%2.0d", Aqi);
-            //display.drawString(0, 20,  "AQI");           display.drawString (30, 20, a_string);   //display.drawString(90, 20, "ppb");
-
-            //sprintf( a_string , "%5.0d", Tvoc);
-            //display.drawString(0, 30,  "TVOC");          display.drawString (23, 30, a_string); 
-
-            //sprintf( a_string , "%5.0lu", Co2);
-            //display.drawString(0, 40,  "eCO2");          display.drawString (30, 40, a_string);  
-        
 
             sprintf( a_string , "%4.0d", battery_voltage);
             display.drawString(62, 0,  "Vbatt");         display.drawString (90, 0, a_string);
 
             //TVOC (left)
-            bar_length = map (Tvoc, tvoc_min, tvoc_max, 0, 64); // bar_left_x1, bar_middle_x2);
-            display.drawString(5, 31,  "TVOC ppb");
+            bar_length = map (bar_Tvoc, tvoc_min, tvoc_max, 0, 64); // bar_left_x1, bar_middle_x2);
+            display.drawString(0, 21,  "TVOC ppb");
             display.drawRect(bar_left_x1, tvoc_top_y, 64,            bar_height);  // x, y, w, h
             display.fillRect(bar_left_x1, tvoc_top_y, bar_length,    bar_height); 
 
             //Co2 (right)     fix this one first
-            bar_length = map (Co2, co2_min, co2_max, 0, 63); //bar_middle_x2, bar_right_x3);
-            display.drawString(70, 31,  "eCO2 ppm");
+            bar_length = map (bar_Co2, co2_min, co2_max, 0, 63); //bar_middle_x2, bar_right_x3);
+            display.drawString(64, 21,  "eCO2 ppm");
             display.drawRect(bar_middle_x2 +1, co2_top_y, 63,          bar_height);  // x, y, w, h
             display.fillRect(bar_middle_x2 +1, co2_top_y, bar_length,  bar_height);
-            debug("Bar length value = ");
-            debugln(bar_length);
 
+
+            //Display the two real values under the bar
+            sprintf( a_string , "%05.0d", Tvoc);
+            display.drawString (0, 36, a_string); 
+
+            sprintf( a_string , "%05.0lu", Co2);
+            display.drawString (64, 36, a_string);   
+            
+            
             // Battery Bar Graph (left)
-            bar_length = map (battery_voltage, vbatt_min, vbatt_max, 0,64); //bar_left_x1, bar_middle_x2);
+            bar_length = map (bar_battery_voltage, vbatt_min, vbatt_max, 0,64);
             display.drawString(20, 46,  "Vbatt");
             display.drawRect(bar_left_x1, vbatt_top_y, 64,          bar_height);  // x, y, w, h
             display.fillRect(bar_left_x1, vbatt_top_y, bar_length,  bar_height); 

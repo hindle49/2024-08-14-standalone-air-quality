@@ -42,11 +42,17 @@
 //        Initial bar graphs are work, but the screen is not optimised.
 //        The air quality readings do not look great. Have placed a delay (5 seconds, via a #DEFINE) to delay the air quality reading.
 //        This will have an effect on the battery life.
+// V0009  Keep this short.
+//        Just move the Temperature and Humidity readings around.
+//        Put the Wifi message as a dummy.
+//        TVOC and eCO2 values added
+//        Constrants added back in.
 
 
 
 
-const int VER = 8;
+
+const int VER = 9;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -147,7 +153,7 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 #define MAX_WAKE_TIME 60000 // 15 seconds on milli seconds. 
 #define SLEEP_TIME    60    //time to deep sleep in seconds
 
-#define HOW_LONG_TO_WARM_UP 15000  // time that the taks will wait before taking a reading in ms 15000 == 15 seconds
+#define HOW_LONG_TO_WARM_UP 2000  // time that the taks will wait before taking a reading in ms 2000 == 2 seconds
 
 
 // display / I2C bus
