@@ -9,9 +9,9 @@ void v_ReadBatteryVoltage(void *parameters)  // The is the main display setting 
    temp_battery_voltage = analogReadMilliVolts(VBATT_PIN);
 
      
-   battery_voltage = (float)(temp_battery_voltage * 2.0);  // This is because the voltage on the pin is half the actual battery voltage.
+   battery_voltage = temp_battery_voltage * 2.0;  // This is because the voltage on the pin is half the actual battery voltage.
 
-   battery_voltage = battery_voltage / 1000; // This is because the the reading is in milli voltages, so convert to volts. In the OLED trunk to one decial place.
+    //Leave the battery_voltage in milli-volts
 
    if (battery_voltage < BATTERY_END_VOLTAGE) // Check to see if the system should be stopped
         {
