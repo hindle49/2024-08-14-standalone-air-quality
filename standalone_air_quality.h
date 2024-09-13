@@ -25,9 +25,28 @@
 // V0007  Add a task to read the battery level.
 //        The battery voltage is presented on anaologue pin A0, via two 1M resistors. Aka, A0 will be 0.5 * battery voltage
 //        The unit is now showing a voltage as a figure on the display Vbatt 4.2. 
+// V0008  An attempt to put the battery voltage as a bar graph at the bottom of the display.
+//        This will need several #defines at the top of the OLED file.
+//        Will also use the map() function to produce a scale
+//        At the end:
+//        1) Temperature as a bar graph     0 to  30
+//        2) Humidity    as a bar graph    50 to 100
+//        3) TVoc        as a bar graph     0 to 65000   ()
+//        4) eCO2        as a bar graph   400 to 65000   (400 is good, > 1500 is bad, use 1500 as the upper bar graph limit
+//        5) VBatt       as a bar graph     2.5 to 4.5
+//
+//        6) AQI         as a figure        1 to 5. Or use the words. Excellent, Good, Moderate, Poor, Unhealthy.
+//        7) Wifi        Off / On / Error
+//
+//        At this stage will stop and save this verison 8 as there has been significant progress.
+//        Initial bar graphs are work, but the screen is not optimised.
+//        The air quality readings do not look great. Have placed a delay (5 seconds, via a #DEFINE) to delay the air quality reading.
+//        This will have an effect on the battery life.
 
 
-const int VER = 7;
+
+
+const int VER = 8;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -45,6 +64,7 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <WiFi.h>
 #include <esp_now.h>
 #include <HTTPClient.h>  //#include <ESPHTTPClient.h>
@@ -53,6 +73,7 @@ const char SKETCH_NAME[] = "Air Quality";
 //#include <SSD1306Wire.h>  // This is for the newer smaller display
 #include <SH1106Wire.h>   // This is for the older style larger display
 #include <OLEDDisplayUi.h>
+//#include <Adafruit_GFX.h>  // Graphics library
 #include <Wire.h>           // for the i2c bus
 #include <ArduinoOTA.h>
 #include <DS3231.h>
@@ -125,6 +146,8 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 
 #define MAX_WAKE_TIME 60000 // 15 seconds on milli seconds. 
 #define SLEEP_TIME    60    //time to deep sleep in seconds
+
+#define HOW_LONG_TO_WARM_UP 15000  // time that the taks will wait before taking a reading in ms 15000 == 15 seconds
 
 
 // display / I2C bus
@@ -235,7 +258,7 @@ unsigned long Hp1         = 0;
 unsigned long Hp2         = 0;
 unsigned long Hp3         = 0;
 
-float         battery_voltage = 0.0;
+unsigned long battery_voltage = 0;
 
 
 
