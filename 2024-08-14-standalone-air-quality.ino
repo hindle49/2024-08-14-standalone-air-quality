@@ -17,7 +17,16 @@ void setup() {
   debug(VER);  // The software version
   debug("\n\n");
 
-  pinMode(BUTTON_1, INPUT_PULLUP); // configure he four button pins as inputs
+  pinMode(BUTTON_1, INPUT_PULLUP); // configure the four button pins as inputs
+  
+  //Keep the pull up during deep sleep 
+  rtc_gpio_pullup_en(BUTTON_1);
+  rtc_gpio_pulldown_dis(BUTTON_1); 
+  
+  //Now turn on the the hardware interrupt pin
+  esp_sleep_enable_ext0_wakeup(BUTTON_1,0); //1 = High, 0 = Low
+  
+  
   
   pinMode(RED_LED, OUTPUT);   // set LED pin to and output
   pinMode(GREEN_LED, OUTPUT); // set LED pin to and output

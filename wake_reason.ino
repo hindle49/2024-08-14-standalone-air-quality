@@ -11,7 +11,18 @@ void wakeup_reason()
   switch(wakeup_reason)
   {
     case ESP_SLEEP_WAKEUP_EXT0 : 
-      debugln("Wakeup caused by external signal using RTC_IO"); 
+      debugln("Wakeup caused by external signal using RTC_IO");
+      WIFI_enabled = !WIFI_enabled;  // Toggle the Wifi Status
+
+      xTaskCreatePinnedToCore(v_read_buttons,
+      "BUTTONS",
+      2048,
+      NULL,
+      2,  //Priority
+      NULL,
+      1);
+      
+      start_RTOS_tasks();
       //ex0_wake_up();
       break;
 
@@ -39,13 +50,13 @@ void wakeup_reason()
       debug("Wakeup was not caused by deep sleep: "); 
       debugln(wakeup_reason );
       
-      digitalWrite(GREEN_LED, HIGH);  // flash the red led for 500ms
+      digitalWrite(RED_LED, HIGH);  // flash the red led for 500ms
       delay(500);
-      digitalWrite(GREEN_LED, LOW);
+      digitalWrite(RED_LED, LOW);
       delay(500);
-      digitalWrite(GREEN_LED, HIGH); // flash the green led for 500ms
+      digitalWrite(RED_LED, HIGH); // flash the green led for 500ms
       delay(500);
-      digitalWrite(GREEN_LED, LOW);
+      digitalWrite(RED_LED, LOW);
       delay(500);
 
       OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
@@ -68,7 +79,8 @@ void vTestForDeepSleep(void *parameters)
         (
           (air_quality_acquired == false) ||   // check to see if these flags are all clear 
           (temp_hum_acquired    == false) ||   // and
-          (display_updated      == false)      // that the time hasn't expired. 
+          (display_updated      == false) ||   // that the time hasn't expired. 
+          (wifi_button_timeout  == false) 
         )                                      // if loop
         &&
         ( 
