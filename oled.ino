@@ -113,7 +113,7 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             display.drawString(0, 10,   "Temp");          display.drawString (28, 10, a_string);    display.drawString(52, 10, "C");
             
             // Humidity
-            sprintf( a_string , "%4.1f", humidity);
+            sprintf( a_string , "%3.0f", humidity);
             display.drawString(64, 10,  "Humid");         display.drawString (99, 10, a_string);   display.drawString(120, 10, "%");
 
 

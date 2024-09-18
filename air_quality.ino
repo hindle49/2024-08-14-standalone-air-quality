@@ -16,11 +16,12 @@ void vReadAirQuality(void *parameters)
         aht.begin();
         ens160.begin();
         
-        ens160.setMode(ENS160_OPMODE_LP);
+        //ens160.setMode(ENS160_OPMODE_LP);
+        ens160.setMode(ENS160_OPMODE_STD);
 
         //vTaskDelay(5000 / portTICK_PERIOD_MS);  // A short sleep until both units have started 5000ms. (5 second)
         air_quality_module_started = true;      // Flag that the two modules have started, so there is no attempt to restart them again.
-        ens160.setMode(ENS160_OPMODE_STD);
+        
         debugln("Started both air quality modules");
        }
 

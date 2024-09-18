@@ -47,12 +47,22 @@
 //        Put the Wifi message as a dummy.
 //        TVOC and eCO2 values added
 //        Constrants added back in.
+// V0010  Add a simple level button press to turn on and off the Wifi function.
+//        Stage 1
+//        This will have to be a wake up in button press. There will be litle oppertinity to read the button during deep sleep. 
+//        Stage 1 button working. Using the RTC feture to keep a pull up resistor active while in deep sleep.
+//        This didn't work in an Input Only pin, so had to move it to a full IO pin. This now in GPIO_NUM_25.
+//        The programming of the GPIO pin has also been done with the nomral GPIO references and not the RTC_GPIO references. 
+//        Stage 2
+//        Enable the button task and call the other tasks.
+//        The button task will toggle the WiFi status.   NOTE: THE DEFINITIONS BELOW WILL HAVE TO STOP SETTING THE WIFI TO FALSE !!!!!!!!!!!!!!!!!
+//        Becuase the Wifi status is stored in RTC memory, the value is lost during a power down.
 
 
 
 
 
-const int VER = 9;
+const int VER = 10;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -73,6 +83,7 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <math.h>
 #include <WiFi.h>
 #include <esp_now.h>
+#include "driver/rtc_io.h"
 #include <HTTPClient.h>  //#include <ESPHTTPClient.h>
 //#include <JsonListener.h>
 #include <time.h>
@@ -125,9 +136,10 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 
 #define GREEN_LED    GPIO_NUM_2   //LED_BUILTIN
 #define RED_LED      GPIO_NUM_15
-//#define EX_RTC_INT GPIO_NUM_33  // RTC_GPIO_08              ADC 1_5
 
-#define BUTTON_1 GPIO_NUM_12
+#define BUTTON_1     GPIO_NUM_25  // This is the button for controlling the WiFi  35
+//#define BUTTON_1     RTC_GPIO_5   //RTC_GPIO05
+
 //#define BUTTON_2 GPIO_NUM_13
 //#define BUTTON_3 GPIO_NUM_14
 //#define BUTTON_4 GPIO_NUM_27
@@ -136,22 +148,22 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 
 #define BATTERY_END_VOLTAGE 3.0
 
-#define OFF   0
-#define ON    1
-#define AUTO  2
-#define STOP  3  // Stop will be used for OTA and RTC modes. More for OLED working
+//#define OFF   0
+//#define ON    1
+//#define AUTO  2
+//#define STOP  3  // Stop will be used for OTA and RTC modes. More for OLED working
    
                           // Have changed these so thay don't overlap with the previous definitions.
-#define NIGHT         50  // This is the dead of night ~ 11pm until 6am
-#define EARLY_MORNING 51  // This is 6am until 7am
-#define MORNING       52  // This is 7am until 9am
-#define DAY           53  // This is 9am until 2pm
-#define EARLY_EVENING 54  // This is 2pm until 3pm
-#define EVENING       55  // This is 3pm unilt 11pm
-#define ERROR         99  // Error state
+//#define NIGHT         50  // This is the dead of night ~ 11pm until 6am
+//#define EARLY_MORNING 51  // This is 6am until 7am
+//#define MORNING       52  // This is 7am until 9am
+//#define DAY           53  // This is 9am until 2pm
+//#define EARLY_EVENING 54  // This is 2pm until 3pm
+//#define EVENING       55  // This is 3pm unilt 11pm
+//#define ERROR         99  // Error state
 
-#define MAX_WAKE_TIME 60000 // 15 seconds on milli seconds. 
-#define SLEEP_TIME    60    //time to deep sleep in seconds
+#define MAX_WAKE_TIME   60000 // 15 seconds on milli seconds. 
+#define SLEEP_TIME      60    //time to deep sleep in seconds
 
 #define HOW_LONG_TO_WARM_UP 2000  // time that the taks will wait before taking a reading in ms 2000 == 2 seconds
 
@@ -250,9 +262,10 @@ bool button1JustChanged[4] = {false, false, false, false}; // used to show the b
 // New variables
 bool air_quality_acquired = false; // Clear to show air quality not yet acquired
 bool temp_hum_acquired    = false; // Clear to show temperature and humidty not yet acquired
-bool display_updated      = false; // Clear to show the OLED has not been updated 
+bool display_updated      = false; // Clear to show the OLED has not been updated
+bool wifi_button_timeout  = true;  // Assum for now that the button hasn't be pressed so deep sleep could be entred. The button taks will set the flaf to false. 
 
-RTC_DATA_ATTR bool WIFI_enabled = false; //Store this in RTC NVRAM. (Might have to remove the = false)
+RTC_DATA_ATTR bool WIFI_enabled; //= false; //Store this in RTC NVRAM. (Might have to remove the = false)
 
 float         temperature = 0.0;
 float         humidity    = 0.0;
