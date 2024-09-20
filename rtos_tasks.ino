@@ -2,6 +2,22 @@ void start_RTOS_tasks()
 
   {
     
+    if (WIFI_enabled)
+    {
+      xTaskCreatePinnedToCore(v_Wifi_connection,
+      "WIFI_CONNECTION",
+      4096,
+      NULL,
+      2,  //Priority
+      NULL,
+      1);
+
+
+    }
+    
+    
+    
+    
     // Start ready for deep sleep
     xTaskCreatePinnedToCore(vTestForDeepSleep,
       "SLEEP_TEST",
@@ -29,17 +45,6 @@ void start_RTOS_tasks()
       NULL,
       1);    
     
-    
-    /*
-    xTaskCreatePinnedToCore(v_read_buttons,
-      "BUTTONS",
-      2048,
-      NULL,
-      2,  //Priority
-      NULL,
-      1);
-    */
-
     xTaskCreatePinnedToCore(v_ReadBatteryVoltage,
       "BATTERY",
       2048,
