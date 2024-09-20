@@ -14,6 +14,7 @@ void wakeup_reason()
       debugln("Wakeup caused by external signal using RTC_IO");
       WIFI_enabled = !WIFI_enabled;  // Toggle the Wifi Status
 
+      //Start the button task because the button has woken the system.
       xTaskCreatePinnedToCore(v_read_buttons,
       "BUTTONS",
       2048,
@@ -60,7 +61,26 @@ void wakeup_reason()
       delay(500);
 
       OLED_StartUpMessages();    // Puts the Hindle message and version number of the display
-      start_RTOS_tasks();
+
+      // Now branch if the Wifi button was pressed at startup 
+
+      if (request_new_WiFi)
+          {
+            // display WiFi Manager Logo message.
+            OLED_WiFi_Manager_Messages();
+            // Start the Wifi task
+                xTaskCreatePinnedToCore(v_Wifi_connection,
+                "WIFI_CONNECTION",
+                4096,
+                NULL,
+                2,  //Priority
+                NULL,
+                1);
+          }
+      else
+         {
+         start_RTOS_tasks();
+         }
       break;
   }
 
@@ -80,7 +100,9 @@ void vTestForDeepSleep(void *parameters)
           (air_quality_acquired == false) ||   // check to see if these flags are all clear 
           (temp_hum_acquired    == false) ||   // and
           (display_updated      == false) ||   // that the time hasn't expired. 
-          (wifi_button_timeout  == false) 
+          (wifi_button_timeout  == false) ||
+          ((WIFI_enabled == true) && (WiFi_Connected == false) )  //is the wifi enabled but not connected yet
+
         )                                      // if loop
         &&
         ( 

@@ -57,12 +57,24 @@
 //        Enable the button task and call the other tasks.
 //        The button task will toggle the WiFi status.   NOTE: THE DEFINITIONS BELOW WILL HAVE TO STOP SETTING THE WIFI TO FALSE !!!!!!!!!!!!!!!!!
 //        Becuase the Wifi status is stored in RTC memory, the value is lost during a power down.
+// V0011  This will introduce the WiFi manager connection process.
+//        This will need to come in two modes. Both modes will need to be working to get V11 functional.
+//        Part 1
+//        At power up, test the button ASAP, if pressed set a flag to say the WiFi details need to be updated.
+//        As this is in the Wifi manager scripts, it will all have to be placed in a task and can be run from sperate parts of the sketch.
+//        In a power on startup read the button. If pressed run a tangent set of functions.
+//        Start the display, with the intial messages.
+//        Then display the Wifi SETUP.
+//        Start the WiFi task, remembering the flag will be set to reset of parmaters. As that is tested, clear the demand 'Request_New_WiFi' flag. 
+//        Note: After the wifi has been checked, the system does not reset, so needs turning off and on again.
+//        Part 2 
+//        If the 'WIFI_enabled' flag is set, start the wifi connection task.
+//        Note: When the power is turned off, the WiFi_Enabled flag will be lost. Therefore, on power up the WiFi will always be off.
 
 
 
 
-
-const int VER = 10;
+const int VER = 11;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -81,7 +93,9 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 #include <WiFi.h>
+
 #include <esp_now.h>
 #include "driver/rtc_io.h"
 #include <HTTPClient.h>  //#include <ESPHTTPClient.h>
@@ -94,7 +108,7 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <Wire.h>           // for the i2c bus
 #include <ArduinoOTA.h>
 #include <DS3231.h>
-#include <BH1750FVI.h>     // for the light sensor
+//#include <BH1750FVI.h>     // for the light sensor
 #include <Adafruit_AHTX0.h>    // Temperature and Humidity
 #include <ScioSense_ENS160.h>  // Air Quality - ENS160 library "Use the Adafruit fork version of the library"
 
@@ -102,11 +116,10 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <WiFiUdp.h>       // for OTA
 #include <ArduinoOTA.h>    // for OTA
 
+
 // wifi
-const char* ssid = "BTHub5-KH6F";      // For OTA - Millfields
-const char* password = "6be3d8bce6";   // For OTA - Millfields
-//const char* ssid = "BT-KSA8P2";          // For OTA - Mum's
-//const char* password = "h7kieNhPe7NCX";  // For OTA - Mum's
+//const char* ssid = "BTHub5-KH6F";      // For OTA - Millfields
+//const char* password = "6be3d8bce6";   // For OTA - Millfields
 
 #define WiFi_Defs 5  // number of WiFi router definintions to try
 
@@ -138,34 +151,18 @@ const char* password = "6be3d8bce6";   // For OTA - Millfields
 #define RED_LED      GPIO_NUM_15
 
 #define BUTTON_1     GPIO_NUM_25  // This is the button for controlling the WiFi  35
-//#define BUTTON_1     RTC_GPIO_5   //RTC_GPIO05
-
-//#define BUTTON_2 GPIO_NUM_13
-//#define BUTTON_3 GPIO_NUM_14
-//#define BUTTON_4 GPIO_NUM_27
+//#define BUTTON_2   GPIO_NUM_13
+//#define BUTTON_3   GPIO_NUM_14
+//#define BUTTON_4   GPIO_NUM_27
 
 #define VBATT_PIN A0 // Pin 4?, or 5. More lickly 5   was A0
 
 #define BATTERY_END_VOLTAGE 3.0
 
-//#define OFF   0
-//#define ON    1
-//#define AUTO  2
-//#define STOP  3  // Stop will be used for OTA and RTC modes. More for OLED working
-   
-                          // Have changed these so thay don't overlap with the previous definitions.
-//#define NIGHT         50  // This is the dead of night ~ 11pm until 6am
-//#define EARLY_MORNING 51  // This is 6am until 7am
-//#define MORNING       52  // This is 7am until 9am
-//#define DAY           53  // This is 9am until 2pm
-//#define EARLY_EVENING 54  // This is 2pm until 3pm
-//#define EVENING       55  // This is 3pm unilt 11pm
-//#define ERROR         99  // Error state
-
-#define MAX_WAKE_TIME   60000 // 15 seconds on milli seconds. 
+#define MAX_WAKE_TIME   60000 // 15 seconds in milli seconds. 
 #define SLEEP_TIME      60    //time to deep sleep in seconds
 
-#define HOW_LONG_TO_WARM_UP 2000  // time that the taks will wait before taking a reading in ms 2000 == 2 seconds
+#define HOW_LONG_TO_WARM_UP 2000  // time that the system will wait before taking a reading in ms 2000 == 2 seconds
 
 
 // display / I2C bus
@@ -217,7 +214,7 @@ char strTemperature[6] = "-99.9";     //Six characters for the temperature -99.9
 bool previous_connection_state;  // us this to record the last status of connection
 bool WiFi_Connected;             // true if a WiFi connection has been made
 byte WiFi_Pnt;                   // initialise WiFi router pointer
-char *WIFI_PWD;                  // router password
+char WIFI_PWD[10];                  // router password
 char *WIFI_SSID;                 // router SSID
 bool isOnce = true;              // use to run in the main loop just once
 //bool  isMQTTmeaasge = true;     // Start up MQTT message will show once
@@ -253,17 +250,16 @@ led_data sent;  // This is for the data sent to the remote Lanterns
 led_data local; // This is for the local data, which is being prepaired for transmission
 
 
-
-bool buttonState[4] = {true, true, true, true}; // used to record the actual state of the button
-
-bool button1JustChanged[4] = {false, false, false, false}; // used to show the button has just change state.
-
-
 // New variables
 bool air_quality_acquired = false; // Clear to show air quality not yet acquired
 bool temp_hum_acquired    = false; // Clear to show temperature and humidty not yet acquired
 bool display_updated      = false; // Clear to show the OLED has not been updated
-bool wifi_button_timeout  = true;  // Assum for now that the button hasn't be pressed so deep sleep could be entred. The button taks will set the flaf to false. 
+bool wifi_button_timeout  = true;  // Assum for now that the button hasn't be pressed so deep sleep could be entred. The button taks will set the flaf to false.
+bool request_new_WiFi     = false; // Used to check if Wifi manger should get a new SSID and PWD
+bool wm_nonblocking       = false; // change to true to use non blocking
+
+WiFiManager wm;                    // Set and instance of WiFIManager to wm
+WiFiManagerParameter custom_field; // global param ( for non blocking w params )
 
 RTC_DATA_ATTR bool WIFI_enabled; //= false; //Store this in RTC NVRAM. (Might have to remove the = false)
 

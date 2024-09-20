@@ -74,6 +74,25 @@ void OLED_StartUpMessages()
 
 }
 
+void OLED_WiFi_Manager_Messages()
+  {
+     display.clear();
+
+     display.drawRect(0, 0, 128, 64);
+     display.drawRect(1, 1, 126, 62);
+     display.drawRect(2, 2, 124, 60);
+
+     display.drawRect(6, 6, 116, 52);
+     display.drawRect(7, 7, 114, 50);
+     display.drawRect(8, 8, 112, 48);
+
+
+     display.setFont(ArialMT_Plain_24);
+     display.setTextAlignment(TEXT_ALIGN_CENTER);
+     display.drawString(64, 20, "Set WiFi");
+     display.display();
+  }
+
 
 void v_updateTheDisplay(void *parameters)  // The is the main display setting am to run once a second
 {
@@ -88,8 +107,14 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
   {
     if (display_updated == false)
        {
-       if ( ( air_quality_acquired == true ) && (temp_hum_acquired == true) ) // both data sets read to display
-            {
+       if ( 
+          (( air_quality_acquired == true ) && (temp_hum_acquired == true) && (WiFi_Connected == true))// both data sets read to display && the wifi is connected
+                                                      ||
+          (( air_quality_acquired == true ) && (temp_hum_acquired == true) && (WIFI_enabled == false)) // both data sets read to display && the wifi is off            
+                          ) 
+           
+           
+           {
             display.init();
             display.flipScreenVertically();
             display.clear();
@@ -104,7 +129,8 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
 
             //Wifi
             display.drawString(0, 0, "WiFi");
-            if (WIFI_enabled == false)  display.drawString(30, 0, "Off");
+            if (WIFI_enabled == false)  display.drawString(25, 0, "Off");
+            if (WIFI_enabled == true)   display.drawString(25, 0, WiFi.SSID());
 
             //Time
 
@@ -117,8 +143,8 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
             display.drawString(64, 10,  "Humid");         display.drawString (99, 10, a_string);   display.drawString(120, 10, "%");
 
 
-            sprintf( a_string , "%4.0d", battery_voltage);
-            display.drawString(62, 0,  "Vbatt");         display.drawString (90, 0, a_string);
+            //sprintf( a_string , "%4.0d", battery_voltage);
+            //display.drawString(62, 0,  "Vbatt");         display.drawString (90, 0, a_string);
 
             //TVOC (left)
             bar_length = map (bar_Tvoc, tvoc_min, tvoc_max, 0, 64); // bar_left_x1, bar_middle_x2);

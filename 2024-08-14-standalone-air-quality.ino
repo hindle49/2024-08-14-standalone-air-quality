@@ -17,7 +17,7 @@ void setup() {
   debug(VER);  // The software version
   debug("\n\n");
 
-  pinMode(BUTTON_1, INPUT_PULLUP); // configure the four button pins as inputs
+  pinMode(BUTTON_1, INPUT_PULLUP); // Read for a quick read of the button
   
   //Keep the pull up during deep sleep 
   rtc_gpio_pullup_en(BUTTON_1);
@@ -26,9 +26,10 @@ void setup() {
   //Now turn on the the hardware interrupt pin
   esp_sleep_enable_ext0_wakeup(BUTTON_1,0); //1 = High, 0 = Low
   
+  //Now check if the button is pressed.
+  request_new_WiFi = !digitalRead(BUTTON_1); // Set to true if the button is pressed.
   
-  
-  pinMode(RED_LED, OUTPUT);   // set LED pin to and output
+  pinMode(RED_LED, OUTPUT);   // set LED pin to and output (it's a blue LED on this board)
   pinMode(GREEN_LED, OUTPUT); // set LED pin to and output
 
   Wire.setClock(100000); // Force the I2C bus frequency
