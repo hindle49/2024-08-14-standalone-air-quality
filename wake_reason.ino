@@ -117,6 +117,8 @@ void vTestForDeepSleep(void *parameters)
    
 else
     {                                        // If the above parameters failed, do a timed deep sleep.
+     force_OLED_update = true;     // force a display update
+     vTaskDelay(1000 / portTICK_PERIOD_MS) ; // 1 seconds
      debugln("Entering deep sleep");
      esp_sleep_enable_timer_wakeup(SLEEP_TIME * 1000000);
      esp_deep_sleep_start();
