@@ -74,9 +74,19 @@
 //        As a reminder this will need another vTask and act on other flags, as well as setting a flag to indicate complete.
 //        air_quality_acquired, temp_hum_acquired
 //        data_sent_to_broker
+// V0013  Just a few improvements.
+//        Known issues. 
+//        a) When acquiring a new Wifi configuration, the unit does not automatically reboot.                             Fixed.
+//        b) Change the battery levels, and the battery bar graph. It needs to have got to zero for 3.6V.                 Change paramters for now.
 
 
-const int VER = 12;
+//        c) When asking for a new Wifi, bypass the sign-on messages, to get more quickly to the WiFi message screen.     Not fixed.
+//        d) Is the bettery scale too long?                                                                               Leave for now.
+//        e) When Wifi is on, but not connecting, show a failure message.
+//        f) The WiFi on/off mode drops occationally. No known reason.
+
+
+const int VER = 13;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -170,7 +180,7 @@ const char SKETCH_NAME[] = "Air Quality";
 
 #define VBATT_PIN A0 // Pin 4?, or 5. More lickly 5   was A0
 
-#define BATTERY_END_VOLTAGE 3.0
+#define BATTERY_END_VOLTAGE 3.6
 
 #define MAX_WAKE_TIME   60000 // 15 seconds in milli seconds. 
 #define SLEEP_TIME      60    //time to deep sleep in seconds

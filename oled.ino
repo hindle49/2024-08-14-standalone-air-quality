@@ -9,7 +9,7 @@
 
 #define bar_height 5
 
-#define vbatt_min 2000
+#define vbatt_min 3600
 #define vbatt_max 4200
 
 #define tvoc_min 0

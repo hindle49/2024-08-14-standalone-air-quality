@@ -68,6 +68,7 @@ void wakeup_reason()
           {
             // display WiFi Manager Logo message.
             OLED_WiFi_Manager_Messages();
+            
             // Start the Wifi task
                 xTaskCreatePinnedToCore(v_Wifi_connection,
                 "WIFI_CONNECTION",
@@ -78,9 +79,9 @@ void wakeup_reason()
                 1);
           }
       else
-         {
-         start_RTOS_tasks();
-         }
+          {
+          start_RTOS_tasks();
+          }
       break;
   }
 
