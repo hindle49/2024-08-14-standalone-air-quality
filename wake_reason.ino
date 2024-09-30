@@ -101,7 +101,8 @@ void vTestForDeepSleep(void *parameters)
           (temp_hum_acquired    == false) ||   // and
           (display_updated      == false) ||   // that the time hasn't expired. 
           (wifi_button_timeout  == false) ||
-          ((WIFI_enabled == true) && (WiFi_Connected == false) )  //is the wifi enabled but not connected yet
+          ((WIFI_enabled == true) && (WiFi_Connected       == false) )   ||   // is the wifi enabled but not connected yet
+          ((WIFI_enabled == true) && (data_sent_to_brocker == false) )        // add sent data flag.
 
         )                                      // if loop
         &&

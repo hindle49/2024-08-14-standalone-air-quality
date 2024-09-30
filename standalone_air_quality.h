@@ -70,11 +70,13 @@
 //        Part 2 
 //        If the 'WIFI_enabled' flag is set, start the wifi connection task.
 //        Note: When the power is turned off, the WiFi_Enabled flag will be lost. Therefore, on power up the WiFi will always be off.
+// V0012  When the Wifi is connected, send all data to the MQTT broker.
+//        As a reminder this will need another vTask and act on other flags, as well as setting a flag to indicate complete.
+//        air_quality_acquired, temp_hum_acquired
+//        data_sent_to_broker
 
 
-
-
-const int VER = 11;
+const int VER = 12;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -96,6 +98,9 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 #include <WiFi.h>
 
+#include <Adafruit_MQTT.h>
+#include <Adafruit_MQTT_Client.h>
+
 #include <esp_now.h>
 #include "driver/rtc_io.h"
 #include <HTTPClient.h>  //#include <ESPHTTPClient.h>
@@ -115,6 +120,7 @@ const char SKETCH_NAME[] = "Air Quality";
 #include <ESPmDNS.h>       // for OTA
 #include <WiFiUdp.h>       // for OTA
 #include <ArduinoOTA.h>    // for OTA
+
 
 
 // wifi
@@ -146,6 +152,13 @@ const char SKETCH_NAME[] = "Air Quality";
 
 #define OLED_DISPLAY_WIDTH 128
 #define OLED_DISPLAY_HEIGHT 64
+
+//MQTT Broker
+#define AIO_SERVER      "millfields.dyndns.org"   // This is still correct
+#define AIO_SERVERPORT  1883                      // use 8883 for SSL - try it with 8883 
+#define AIO_USERNAME    "homeassistant"
+#define AIO_KEY         "Loo2me1aaR4Mee5Ohquae6ohChitoh4chogiehoanoongaeL1iMahr3gai4Oosux"   //put a new key in here
+
 
 #define GREEN_LED    GPIO_NUM_2   //LED_BUILTIN
 #define RED_LED      GPIO_NUM_15
@@ -257,6 +270,7 @@ bool display_updated      = false; // Clear to show the OLED has not been update
 bool wifi_button_timeout  = true;  // Assum for now that the button hasn't be pressed so deep sleep could be entred. The button taks will set the flaf to false.
 bool request_new_WiFi     = false; // Used to check if Wifi manger should get a new SSID and PWD
 bool wm_nonblocking       = false; // change to true to use non blocking
+bool data_sent_to_brocker = false; // use this to flag if data has been sent to the MQTT broker
 
 WiFiManager wm;                    // Set and instance of WiFIManager to wm
 WiFiManagerParameter custom_field; // global param ( for non blocking w params )
@@ -274,6 +288,25 @@ unsigned long Hp2         = 0;
 unsigned long Hp3         = 0;
 
 unsigned long battery_voltage = 0;
+
+// Define C++ clases
+// Create an ESP32 WiFiClient class.
+WiFiClient /*Secure*/ client;   //Note: when this was set for WiFiClient Secure the MQTT would not connect
+// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+
+
+// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
+Adafruit_MQTT_Publish item_0   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/temperature");
+Adafruit_MQTT_Publish item_1   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/humidity");
+Adafruit_MQTT_Publish item_2   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/aqi");
+Adafruit_MQTT_Publish item_3   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/tvoc");
+Adafruit_MQTT_Publish item_4   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/co2");
+Adafruit_MQTT_Publish item_5   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/hp0");
+Adafruit_MQTT_Publish item_6   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/hp1");
+Adafruit_MQTT_Publish item_7   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/hp2");
+Adafruit_MQTT_Publish item_8   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/hp3");
+Adafruit_MQTT_Publish item_9   = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "stand_alone_air_quality/battery_voltage");
 
 
 
