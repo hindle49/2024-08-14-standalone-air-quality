@@ -9,7 +9,7 @@ void v_Wifi_connection(void *parameters)  // The is the main display setting am 
     if (request_new_WiFi)  // test to see if the flag is set to ask for new wifi
       {
         wm.resetSettings(); // wipe settings
-        request_new_WiFi = false; // stop the request from happing again
+        //request_new_WiFi = false; // stop the request from happing again
       }
 
     if(wm_nonblocking) wm.setConfigPortalBlocking(false);
@@ -76,7 +76,12 @@ void v_Wifi_connection(void *parameters)  // The is the main display setting am 
       debugln("connected...yeey ");
       //WIFI_SSID = wm.getSSID();
       debugln (WiFi.SSID() );
-      //ESP.restart();
+
+     if (request_new_WiFi)
+        { 
+        request_new_WiFi = false;
+        ESP.restart();  // Should this be the route to reboot after assigning a new WiFI (or does this keep looping?)
+        }
       }
     vTaskDelay(1000 / portTICK_PERIOD_MS);  //300ms delay, before looping again
   } // End of while
