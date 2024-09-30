@@ -79,14 +79,16 @@
 //        a) When acquiring a new Wifi configuration, the unit does not automatically reboot.                             Fixed.
 //        b) Change the battery levels, and the battery bar graph. It needs to have got to zero for 3.6V.                 Change paramters for now.
 
+// V0014
+//        c) When Wifi is on, but not connecting, show a failure message.                                                 Fixed
 
-//        c) When asking for a new Wifi, bypass the sign-on messages, to get more quickly to the WiFi message screen.     Not fixed.
-//        d) Is the bettery scale too long?                                                                               Leave for now.
-//        e) When Wifi is on, but not connecting, show a failure message.
+
+//        d) When asking for a new Wifi, bypass the sign-on messages, to get more quickly to the WiFi message screen.     Not fixed.
+//        e) Is the bettery scale too long?                                                                               Leave for now.
 //        f) The WiFi on/off mode drops occationally. No known reason.
 
 
-const int VER = 13;
+const int VER = 14;
 const char SKETCH_NAME[] = "Air Quality";
 
 #define DEBUG true  // just set to enable debug, or not
@@ -281,6 +283,7 @@ bool wifi_button_timeout  = true;  // Assum for now that the button hasn't be pr
 bool request_new_WiFi     = false; // Used to check if Wifi manger should get a new SSID and PWD
 bool wm_nonblocking       = false; // change to true to use non blocking
 bool data_sent_to_brocker = false; // use this to flag if data has been sent to the MQTT broker
+bool force_OLED_update    = false; // use this flag to force the OLED to do and update
 
 WiFiManager wm;                    // Set and instance of WiFIManager to wm
 WiFiManagerParameter custom_field; // global param ( for non blocking w params )

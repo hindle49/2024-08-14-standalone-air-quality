@@ -107,11 +107,13 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
   {
     if (display_updated == false)
        {
-       if ( 
+       if    ( 
           (( air_quality_acquired == true ) && (temp_hum_acquired == true) && (WiFi_Connected == true))// both data sets read to display && the wifi is connected
                                                       ||
-          (( air_quality_acquired == true ) && (temp_hum_acquired == true) && (WIFI_enabled == false)) // both data sets read to display && the wifi is off            
-                          ) 
+          (( air_quality_acquired == true ) && (temp_hum_acquired == true) && (WIFI_enabled == false)) // both data sets read to display && the wifi is off
+                                                      ||
+                                        (force_OLED_update == true)            
+              ) 
            
            
            {
@@ -129,8 +131,9 @@ void v_updateTheDisplay(void *parameters)  // The is the main display setting am
 
             //Wifi
             display.drawString(0, 0, "WiFi");
-            if (WIFI_enabled == false)  display.drawString(25, 0, "Off");
-            if (WIFI_enabled == true)   display.drawString(25, 0, WiFi.SSID());
+            if  (WIFI_enabled == false)  display.drawString(25, 0, "Off");
+            if ((WIFI_enabled == true) && (WiFi_Connected == true ))  display.drawString(25, 0, WiFi.SSID());
+            if ((WIFI_enabled == true) && (WiFi_Connected == false))  display.drawString(25, 0, "Failed");            
 
             //Time
 
